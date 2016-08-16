@@ -1,0 +1,48 @@
+Notes on Forcibly Retracting E-Mails
+------------------------------------
+
+#############################################################
+FOR PERMANENT DELETE :
+Search-Mailbox -Identity sample.user -SearchQuery 'Subject:"Email title"' -DeleteContent
+#############################################################
+
+1) Give Administrator permission to do it (one-off task - already done for DOMIAN\Administrator) :
+
+New-ManagementRoleAssignment -Role "Mailbox Import Export" -User Administrator
+
+This gives permission to use "New-MailboxImportRequest" and "Search-Mailbox".
+
+To see it : Get-ManagementRoleAssignment -Role "Mailbox Import Export"
+
+2) Do a dry-run to verify that the search will find the *right* E-Mails :
+
+Get-DistributionGroupMember -Identity "AliasNameofDistGroupthatEmailwasSentTo" | Search-Mailbox -whatif -searchquery "Subject:'Put Exact Subject Here'" -TargetFolder "Mailbox Search Results" -TargetMailbox PutYOURAliasHere -logonly -loglevel full
+
+Notes :
+
+- This command assumes that ALL mailboxes on the Distrubution Group are Exchange Mailboxes on the Exchange Servers
+- This command assumes that the size of data being searched is reasonable, ie - only a manageable number of mailboxes, none of which are huge - Very slow on larger mailboxes
+
+Example :
+
+Get-DistributionGroupMember -Identity "Email Alerts" | Search-Mailbox -whatif -searchquery "Subject:'Sample Email'" -TargetFolder "Mailbox Search Results" -TargetMailbox dump.mailbox -logonly -loglevel full
+
+3) Examine the results of the dry-run to verify you got the criteria correct :
+
+Look in the "Mailbox Search Results" folder in the Target mailbox - you will see an E-Mail with an attachment that will have the details of every E-Mail that was found by the search.
+
+4) Perform the Search and Destroy :
+
+*** WARNING - This next command DOES IT!  There's no going back after this! ***
+
+Get-DistributionGroupMember -Identity "AliasNameofDistGroupthatEmailwasSentTo" | Search-Mailbox -searchquery "Subject:'Put Exact Subject Here'" -TargetFolder "Mailbox Search Results" -TargetMailbox PutYourAliasHere -loglevel full -DeleteContent
+
+Changes :
+
+- Removed "-whatif" and "-logonly" switches
+- Added "-DeleteContent" switch
+
+This will SEARCH for the E-Mails, COPY them to the Target mailbox, then DELETE them from the source mailbox.
+
+Notes originally assembled by D. Bylund
+

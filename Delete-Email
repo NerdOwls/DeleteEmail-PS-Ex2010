@@ -1,0 +1,1 @@
+Get-DistributionGroupMember -Identity "AliasNameofDistGroupthatEmailwasSentTo" | Search-Mailbox -searchquery "Subject:'Put Exact Subject Here'" -TargetFolder "Mailbox Search Results" -TargetMailbox PutYourAliasHere -loglevel full -DeleteContent

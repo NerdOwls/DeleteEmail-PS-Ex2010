@@ -1,0 +1,1 @@
+Get-DistributionGroupMember -Identity "Email Alerts" | Search-Mailbox -whatif -searchquery "Subject:'Sample Email'" -TargetFolder "Mailbox Search Results" -TargetMailbox dump.mailbox -logonly -loglevel full
